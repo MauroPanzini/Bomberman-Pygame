@@ -1,0 +1,6 @@
+VERDE = (0, 255, 0)
+VERDE_OSCURO = (0, 150, 0)
+BLANCO = (255, 255, 255)
+NEGRO = (0, 0, 0)
+ROJO = (255, 0, 0)
+AZUL_OSCURO = (20, 20, 255)
