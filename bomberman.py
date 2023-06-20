@@ -669,7 +669,7 @@ class Juego:
         self.pantalla.fill(NEGRO)
         self.tabla_puntajes.consultar_puntaje()
         cantidad_puntajes = len(self.tabla_puntajes.lista_puntajes)
-        if cantidad_puntajes != -1:
+        if cantidad_puntajes != 0:
             if cantidad_puntajes > 5:
                 cantidad_puntajes = 5
             i = 0
