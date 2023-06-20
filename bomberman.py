@@ -373,10 +373,10 @@ class Score(pygame.sprite.Sprite):
 
         self.conn = sqlite3.connect('puntajes.db')
         self.cursor = self.conn.cursor()
+        self.cursor.execute('CREATE TABLE IF NOT EXISTS puntajes (nombre TEXT, puntaje INTEGER)')
 
     def insertar_puntaje(self, nombre, puntaje):
         self.conectar_base()
-        self.cursor.execute('CREATE TABLE IF NOT EXISTS puntajes (nombre TEXT, puntaje INTEGER)')
         self.cursor.execute('INSERT INTO puntajes VALUES (?, ?)', (nombre, puntaje))
         self.conn.commit()
         self.conn.close()
@@ -391,15 +391,23 @@ class Score(pygame.sprite.Sprite):
     
     def consultar_puntaje(self):
         resultados = self.ordenar_tabla()
-        for fila in resultados:
-            nombre = fila[0]
-            puntaje = fila[1]
-            self.lista_puntajes.append({'nombre': nombre,'puntaje': puntaje})
+        if len(resultados) < 1:
+            return -1
+        else:
+            for fila in resultados:
+                nombre = fila[0]
+                puntaje = fila[1]
+                self.lista_puntajes.append({'nombre': nombre,'puntaje': puntaje})
     
     def consultar_puntaje_maximo(self):
         retorno = False
         resultados = self.ordenar_tabla()
-        for i in range(5):
+        cantidad_puntajes = len(resultados)
+        if cantidad_puntajes > 5:
+            cantidad_puntajes = 5
+        else:
+            retorno = True
+        for i in range(cantidad_puntajes):
             if juego.jugador.puntaje > resultados[i][1]:
                 retorno = True
         return retorno
@@ -657,36 +665,55 @@ class Juego:
             pygame.display.flip()
 
     def mostrar_records(self, fuente):
-        
+        self.tabla_puntajes.lista_puntajes.clear()
         self.pantalla.fill(NEGRO)
         self.tabla_puntajes.consultar_puntaje()
-        i = 0
-        highscores = fuente.render("HIGHSCORES", True, BLANCO)
-        self.pantalla.blit(highscores, (230, 90))
-        for jugador in range(5):
-            x = (ANCHO / 2)
-            y = 150
-            if jugador == 0:
-                color = AZUL_OSCURO
-            else:
-                color = BLANCO
-            print(str(self.tabla_puntajes.lista_puntajes[jugador]))
-            nombre = fuente.render(str(self.tabla_puntajes.lista_puntajes[jugador]['nombre']), True, color)
-            self.pantalla.blit(nombre, (x - 200, y + (i*100)))
-            puntaje = fuente.render(str(self.tabla_puntajes.lista_puntajes[jugador]['puntaje']), True, color)
-            self.pantalla.blit(puntaje, (x + 100, y + (i*100)))
-            
+        cantidad_puntajes = len(self.tabla_puntajes.lista_puntajes)
+        if cantidad_puntajes != -1:
+            if cantidad_puntajes > 5:
+                cantidad_puntajes = 5
+            i = 0
+            highscores = fuente.render("HIGHSCORES", True, BLANCO)
+            self.pantalla.blit(highscores, (230, 90))
+            for jugador in range(cantidad_puntajes):
+                print(self.tabla_puntajes.lista_puntajes[jugador])
+                x = (ANCHO / 2)
+                y = 150
+                print(jugador)
+                if jugador == 0:
+                    color = AZUL_OSCURO
+                else:
+                    color = BLANCO
+                nombre = fuente.render(str(self.tabla_puntajes.lista_puntajes[jugador]['nombre']), True, color)
+                self.pantalla.blit(nombre, (x - 200, y + (i*100)))
+                puntaje = fuente.render(str(self.tabla_puntajes.lista_puntajes[jugador]['puntaje']), True, color)
+                self.pantalla.blit(puntaje, (x + 100, y + (i*100)))
+                
+                fuente = pygame.font.Font(ruta_fuente, 30) 
+                press_enter = fuente.render("Press enter to return", True, BLANCO)
+                press_enter_rect = press_enter.get_rect()
+                press_enter_rect.center = (ANCHO/2, ALTO/2 + 300)
+                self.pantalla.blit(press_enter, press_enter_rect)
+                fuente = pygame.font.Font(ruta_fuente, 36)
+                self.pantalla.blit(press_enter, press_enter_rect)
+                oro = pygame.image.load("Imagenes/medallaOro.png")
+                self.pantalla.blit(oro, (x - 270, y - 10))
+                pygame.display.flip()
+                i += 1
+            pygame.display.flip()
+        else:
+            txt = fuente.render("No records to display, be the first!", True, BLANCO)
+            txt_rect = txt.get_rect()
+            txt_rect.center = (ANCHO/2, ALTO/2)
+            self.pantalla.blit(txt, txt_rect)
             fuente = pygame.font.Font(ruta_fuente, 30) 
             press_enter = fuente.render("Press enter to return", True, BLANCO)
             press_enter_rect = press_enter.get_rect()
             press_enter_rect.center = (ANCHO/2, ALTO/2 + 300)
             self.pantalla.blit(press_enter, press_enter_rect)
             fuente = pygame.font.Font(ruta_fuente, 36)
-            self.pantalla.blit(press_enter, press_enter_rect)
-            oro = pygame.image.load("Imagenes/medallaOro.png")
-            self.pantalla.blit(oro, (x - 270, y - 10))
             pygame.display.flip()
-            i += 1
+
         while True:
             for event in pygame.event.get():      
                 if event.type == pygame.QUIT:
@@ -721,7 +748,6 @@ class Juego:
             pantalla.blit(texto_puntaje, (x, y))
 
     def menu_inicial(self, pantalla, fuente):
-        ruta_fuente = "C:/Users/Mau/AppData/Local/Microsoft/Windows/Fonts/EIGHT-BIT-MADNESS.TTF"
         if self.bandera_entrada == False:
             musica = pygame.mixer.Sound("Sonido/musicaMenu.mp3")
             self.bandera_entrada = True
