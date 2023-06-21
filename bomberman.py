@@ -521,14 +521,10 @@ class Juego:
                 self.musica_end.set_volume(0.2)
                 self.musica_end.play()
             pantalla.fill((0, 0, 0))
-            
-            
             texto_puntaje = fuente.render("Final score: "+ str(self.jugador.puntaje), True, BLANCO)
             texto_puntaje_rect = texto_puntaje.get_rect()
             texto_puntaje_rect.center = (ANCHO/2, ALTO - 200)
-
             fuente = pygame.font.Font(ruta_fuente, 70) 
-            # Dibujar el texto en la pantalla
             texto_game_over = fuente.render("Game Over", True, COLOR)
             game_over_rect = texto_game_over.get_rect()
             game_over_rect.center = (ANCHO/2, 150)
@@ -590,8 +586,6 @@ class Juego:
 
                     # Actualizar la pantalla
                     pygame.display.flip()
-        
-            # Actualizar la pantalla
             pygame.display.flip()
         else:
             self.musica_end.stop()
@@ -678,7 +672,7 @@ class Juego:
             if cantidad_puntajes > 5:
                 cantidad_puntajes = 5
             i = 0
-            highscores = fuente.render("HIGHSCORES", True, BLANCO)
+            highscores = fuente.render("HIGHSCORES", True, ROJO)
             self.pantalla.blit(highscores, (230, 90))
             for jugador in range(cantidad_puntajes):
                 print(self.tabla_puntajes.lista_puntajes[jugador])
@@ -688,7 +682,7 @@ class Juego:
                 if jugador == 0:
                     color = AZUL_OSCURO
                 else:
-                    color = BLANCO
+                    color = ROSA
                 nombre = fuente.render(str(self.tabla_puntajes.lista_puntajes[jugador]['nombre']), True, color)
                 self.pantalla.blit(nombre, (x - 200, y + (i*100)))
                 puntaje = fuente.render(str(self.tabla_puntajes.lista_puntajes[jugador]['puntaje']), True, color)
