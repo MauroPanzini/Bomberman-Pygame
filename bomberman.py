@@ -508,13 +508,18 @@ class Juego:
             if self.jugador.vidas > 0 and tiempo > 0:
                 COLOR = VERDE
                 es_top_cinco = self.tabla_puntajes.consultar_puntaje_maximo()
+                self.musica_end = pygame.mixer.Sound("Sonido/musicaVictoria.mp3")
                 if es_top_cinco:
+                    self.musica_end.play()
                     records = self.guardar_records(fuente)
                     if records == 0:
                         print("Puntaje guardado con éxito")
 
             else:
                 COLOR = ROJO
+                self.musica_end = pygame.mixer.Sound("Sonido/findeljuego.mp3")
+                self.musica_end.set_volume(0.2)
+                self.musica_end.play()
             pantalla.fill((0, 0, 0))
             
             
@@ -533,8 +538,8 @@ class Juego:
             if self.bandera_end == False:
                 fuente = pygame.font.Font(ruta_fuente, 36)
                 self.bandera_end = True
-                self.musica_end.set_volume(0.2)
-                self.musica_end.play()
+                # self.musica_end.set_volume(0.2)
+                # self.musica_end.play()
                 for bloque in self.bloques:
                     bloque.kill()
                 for caja in self.cajas:
@@ -751,6 +756,7 @@ class Juego:
         if self.bandera_entrada == False:
             musica = pygame.mixer.Sound("Sonido/musicaMenu.mp3")
             self.bandera_entrada = True
+            self.musica_end.stop()
         sonido_menu = pygame.mixer.Sound("Sonido/sonidoMenu.mp3")
         sonido_seleccion = pygame.mixer.Sound("Sonido/SeleccionOpcion.mp3")
         opciones_menu = ["Play", "Leaderboard", "Exit"]
@@ -899,6 +905,7 @@ class Juego:
                 explosion.kill()
             for bomba in self.bombas:
                 bomba.kill()
+            self.fondo = AZUL_OSCURO
             self.musica_nivel_dos.play(1)
             pantalla.fill(NEGRO)
             self.crear_bloques()
@@ -954,6 +961,7 @@ class Juego:
                 explosion.kill()
             for bomba in self.bombas:
                 bomba.kill()
+            self.fondo = ROJO
             pantalla.fill(NEGRO)
             self.musica_nivel_tres.play()
             self.crear_bloques()
